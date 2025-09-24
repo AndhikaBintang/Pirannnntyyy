@@ -498,12 +498,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 567074865}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &476623917 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2470222878266176508, guid: 29522a9168212d347b10c73cef542b64,
-    type: 3}
-  m_PrefabInstance: {fileID: 3907021846357415237}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &476623918 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2957789848324892998, guid: 29522a9168212d347b10c73cef542b64,
@@ -1092,7 +1086,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 177107155}
   platformPrefabs:
-  - {fileID: 476623917}
+  - {fileID: 4941233955380027684, guid: cf584b853febe4441ba365e30dcadb59, type: 3}
+  - {fileID: 4941233955380027684, guid: e3480249679b50f46aacec4916b85ac4, type: 3}
   poolPerPrefab: 6
   gapMin: 0.6
   gapMax: 2.2
