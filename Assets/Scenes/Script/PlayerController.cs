@@ -17,8 +17,8 @@ public class PlayerController : MonoBehaviour
     private CharacterController characterController;
     private Vector3 velocity;
     private Animator animator;
-    private bool isGrounded;
     private float horizontalInput;
+    private bool isGrounded;
     private int jumpCount = 0;
 
     private bool isHovering = false;
@@ -32,8 +32,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        horizontalInput = 1; // auto jalan kanan
-        transform.forward = Vector3.right; // biar gak miring 45°
+        // ==== Input kiri / kanan (A/D atau Arrow Left/Right) ====
+        float horizontalInput = Input.GetAxisRaw("Horizontal"); // -1 = kiri, 1 = kanan
+
+        // Atur rotasi player sesuai arah gerakan
+        if (horizontalInput > 0)
+            transform.forward = Vector3.right; // menghadap kanan
+        else if (horizontalInput < 0)
+            transform.forward = Vector3.left; // menghadap kiri
 
         // ==== Ground Check ====
         isGrounded = false;
@@ -75,13 +81,12 @@ public class PlayerController : MonoBehaviour
                 jumpCount++;
                 if (jumpCount >= maxJumps)
                 {
-                    // siap hover setelah lompat terakhir
-                    hoverTimer = hoverDuration;
+                    hoverTimer = hoverDuration; // aktifkan hover hanya setelah double jump
                 }
             }
         }
 
-        // ==== Hovering (hanya setelah double jump & dengan timer) ====
+        // ==== Hovering ====
         if (jumpCount >= maxJumps && !isGrounded && Input.GetButton("Jump") && hoverTimer > 0f)
         {
             isHovering = true;
@@ -97,8 +102,13 @@ public class PlayerController : MonoBehaviour
         // ==== Movement ====
         Vector3 move = blocked ? Vector3.zero : new Vector3(horizontalInput * runSpeed, 0, 0);
         characterController.Move((move + velocity) * Time.deltaTime);
-        animator.SetFloat("speed", horizontalInput);
-        animator.SetBool("isGrounded", isGrounded);
-        animator.SetFloat("VerticalSpeed", velocity.y);
+
+        // ==== Animator Sync ====
+        if (animator != null)
+        {
+            animator.SetFloat("speed", Mathf.Abs(horizontalInput));
+            animator.SetBool("isGrounded", isGrounded);
+            animator.SetFloat("VerticalSpeed", velocity.y);
+        }
     }
 }
