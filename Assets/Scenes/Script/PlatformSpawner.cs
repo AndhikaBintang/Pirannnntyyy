@@ -19,6 +19,8 @@ public class PlatformSpawner : MonoBehaviour
     public float maxDrop = 3f;   // max penurunan antar platform
     public float despawnDistance = 12f; // jarak di belakang player untuk despawn
 
+    public event System.Action<GameObject> OnPlatformSpawned;
+    
     [Header("Auto-calc from player (optional)")]
     public float playerSpeedX = 4f;
     public float jumpInitialVelocity = 5f; // isi sesuai player
@@ -92,48 +94,58 @@ public class PlatformSpawner : MonoBehaviour
     }
 
     void SpawnPlatform()
-{
-    int idx = Random.Range(0, platformPrefabs.Count);
-    var go = GetFromPool(idx);
-    float width = GetPlatformWidth(go);
-
-    float gap = 0f;
-
-    // random pilih jenis gap
-    float roll = Random.value; // antara 0 - 1
-    if (roll < 0.3f)
     {
-        // 30% chance: platform rapat/menempel
-        gap = Random.Range(0f, 0.5f);
-    }
-    else if (roll < 0.8f)
-    {
-        // 50% chance: normal gap
-        gap = Random.Range(gapMin, gapMax);
-    }
-    else
-    {
-        // 20% chance: jauh tapi masih bisa dilompati
-        float maxGap = autoCalcGapFromJump 
-            ? ComputeMaxHorizontalDistance(playerSpeedX, jumpInitialVelocity) * safetyFactor 
-            : gapMax * 1.5f;
+        int idx = Random.Range(0, platformPrefabs.Count);
+        var go = GetFromPool(idx);
+        float width = GetPlatformWidth(go);
 
-        gap = Random.Range(gapMax, Mathf.Max(gapMax + 1f, maxGap));
-    }
+        float gap = 0f;
 
-    float spawnCenterX = lastPlatformRightX + gap + width / 2f;
+        // random pilih jenis gap
+        float roll = Random.value; // antara 0 - 1
+        if (roll < 0.3f)
+        {
+            // 30% chance: platform rapat/menempel
+            gap = Random.Range(0f, 0.5f);
+        }
+        else if (roll < 0.8f)
+        {
+            // 50% chance: normal gap
+            gap = Random.Range(gapMin, gapMax);
+        }
+        else
+        {
+            // 20% chance: jauh tapi masih bisa dilompati
+            float maxGap = autoCalcGapFromJump
+                ? ComputeMaxHorizontalDistance(playerSpeedX, jumpInitialVelocity) * safetyFactor
+                : gapMax * 1.5f;
 
-    // ketinggian: harus dalam batas maxRise / maxDrop relatif ke platform sebelumnya
-    float minAllowedY = Mathf.Max(minY, lastPlatformY - maxDrop);
-    float maxAllowedY = Mathf.Min(maxY, lastPlatformY + maxRise);
-    float y = Random.Range(minAllowedY, maxAllowedY);
+            gap = Random.Range(gapMax, Mathf.Max(gapMax + 1f, maxGap));
+        }
 
-    go.transform.position = new Vector3(spawnCenterX, y, 0f);
+        float spawnCenterX = lastPlatformRightX + gap + width / 2f;
+
+        // ketinggian: harus dalam batas maxRise / maxDrop relatif ke platform sebelumnya
+        float minAllowedY = Mathf.Max(minY, lastPlatformY - maxDrop);
+        float maxAllowedY = Mathf.Min(maxY, lastPlatformY + maxRise);
+        float y = Random.Range(minAllowedY, maxAllowedY);
+
+        go.transform.position = new Vector3(spawnCenterX, y, 0f);
+        go.SetActive(true);
+        activePlatforms.Add(go);
+
+        lastPlatformRightX = spawnCenterX + width / 2f;
+        lastPlatformY = y;
+
+        go.transform.position = new Vector3(spawnCenterX, y, 0f);
     go.SetActive(true);
     activePlatforms.Add(go);
 
     lastPlatformRightX = spawnCenterX + width / 2f;
     lastPlatformY = y;
+
+    // trigger event
+    OnPlatformSpawned?.Invoke(go);
 }
 
 

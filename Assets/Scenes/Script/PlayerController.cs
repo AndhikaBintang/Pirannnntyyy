@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     private CharacterController characterController;
     private Vector3 velocity;
+    private Animator animator;
     private bool isGrounded;
     private float horizontalInput;
     private int jumpCount = 0;
@@ -26,6 +27,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -71,7 +73,7 @@ public class PlayerController : MonoBehaviour
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
                 jumpCount++;
-                if (jumpCount >= maxJumps) 
+                if (jumpCount >= maxJumps)
                 {
                     // siap hover setelah lompat terakhir
                     hoverTimer = hoverDuration;
@@ -95,5 +97,8 @@ public class PlayerController : MonoBehaviour
         // ==== Movement ====
         Vector3 move = blocked ? Vector3.zero : new Vector3(horizontalInput * runSpeed, 0, 0);
         characterController.Move((move + velocity) * Time.deltaTime);
+        animator.SetFloat("speed", horizontalInput);
+        animator.SetBool("isGrounded", isGrounded);
+        animator.SetFloat("VerticalSpeed", velocity.y);
     }
 }
