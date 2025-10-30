@@ -4,15 +4,22 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Ground & Movement")]
     [SerializeField] LayerMask groundLayer;
     [SerializeField] private float runSpeed = 10f;
     [SerializeField] private Transform[] groundChecks;
     [SerializeField] private Transform[] wallChecks;
+
+    [Header("Jump & Hover")]
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float gravity = -50f;
-    [SerializeField] private int maxJumps = 2;           // double jump
-    [SerializeField] private float hoverGravity = -5f;   // gravitasi ringan saat hover
-    [SerializeField] private float hoverDuration = 1.2f; // durasi maksimal hover (detik)
+    [SerializeField] private int maxJumps = 2;
+    [SerializeField] private float hoverGravity = -5f;
+    [SerializeField] private float hoverDuration = 1.2f;
+
+    [Header("Death & Respawn")]
+    [SerializeField] private float fallDeathY = -10f;
+    [SerializeField] private Transform respawnPoint;
 
     private CharacterController characterController;
     private Vector3 velocity;
@@ -28,18 +35,34 @@ public class PlayerController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+
+        if (respawnPoint == null)
+        {
+            GameObject go = new GameObject("RespawnPoint");
+            go.transform.position = transform.position;
+            respawnPoint = go.transform;
+        }
     }
 
     void Update()
     {
-        // ==== Input kiri / kanan (A/D atau Arrow Left/Right) ====
-        float horizontalInput = Input.GetAxisRaw("Horizontal"); // -1 = kiri, 1 = kanan
+        // ==== Death Check ====
+        if (transform.position.y < fallDeathY)
+        {
+            DieAndRespawn();
+            return;
+        }
 
-        // Atur rotasi player sesuai arah gerakan
-        if (horizontalInput > 0)
-            transform.forward = Vector3.right; // menghadap kanan
-        else if (horizontalInput < 0)
-            transform.forward = Vector3.left; // menghadap kiri
+        // ==== Input kiri/kanan (X) & maju/mundur (Z) ====
+        float horizontalInput = Input.GetAxisRaw("Horizontal"); // A/D
+        float verticalInput = Input.GetAxisRaw("Vertical");     // W/S
+
+        // Update arah facing player kalau ada input
+        Vector3 facingDir = new Vector3(horizontalInput, 0, verticalInput);
+        if (facingDir.sqrMagnitude > 0.01f)
+        {
+            transform.forward = facingDir.normalized;
+        }
 
         // ==== Ground Check ====
         isGrounded = false;
@@ -63,7 +86,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // ==== Reset Jump & Hover saat di tanah ====
+        // ==== Reset Jump & Hover ====
         if (isGrounded)
         {
             jumpCount = 0;
@@ -72,7 +95,7 @@ public class PlayerController : MonoBehaviour
             if (velocity.y < 0) velocity.y = 0;
         }
 
-        // ==== Lompat (maksimal 2 kali) ====
+        // ==== Lompat ====
         if (Input.GetButtonDown("Jump"))
         {
             if (jumpCount < maxJumps)
@@ -81,12 +104,12 @@ public class PlayerController : MonoBehaviour
                 jumpCount++;
                 if (jumpCount >= maxJumps)
                 {
-                    hoverTimer = hoverDuration; // aktifkan hover hanya setelah double jump
+                    hoverTimer = hoverDuration;
                 }
             }
         }
 
-        // ==== Hovering ====
+        // ==== Hover ====
         if (jumpCount >= maxJumps && !isGrounded && Input.GetButton("Jump") && hoverTimer > 0f)
         {
             isHovering = true;
@@ -99,16 +122,37 @@ public class PlayerController : MonoBehaviour
             velocity.y += gravity * Time.deltaTime;
         }
 
-        // ==== Movement ====
-        Vector3 move = blocked ? Vector3.zero : new Vector3(horizontalInput * runSpeed, 0, 0);
+        // ==== Movement (X/Z) ====
+        Vector3 move = new Vector3(horizontalInput * runSpeed, 0, verticalInput * runSpeed);
+        if (blocked) move = Vector3.zero;
+
         characterController.Move((move + velocity) * Time.deltaTime);
 
         // ==== Animator Sync ====
         if (animator != null)
         {
-            animator.SetFloat("speed", Mathf.Abs(horizontalInput));
+            animator.SetFloat("speed", new Vector2(horizontalInput, verticalInput).magnitude);
             animator.SetBool("isGrounded", isGrounded);
             animator.SetFloat("VerticalSpeed", velocity.y);
         }
+    }
+
+    private void DieAndRespawn()
+    {
+        Debug.Log("Player jatuh & respawn!");
+
+        velocity = Vector3.zero;
+        characterController.enabled = false;
+        transform.position = respawnPoint.position;
+        characterController.enabled = true;
+
+        jumpCount = 0;
+        isHovering = false;
+        hoverTimer = 0f;
+    }
+
+    public void SetCheckpoint(Vector3 newPosition)
+    {
+        respawnPoint.position = newPosition;
     }
 }
