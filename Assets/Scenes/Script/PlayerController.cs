@@ -22,14 +22,23 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform respawnPoint;
 
     private CharacterController characterController;
+
+    // --- Controller MPU6050 ---
+    [SerializeField] private MPU6050Controller controller;
+
     private Vector3 velocity;
     private Animator animator;
-    private float horizontalInput;
     private bool isGrounded;
     private int jumpCount = 0;
 
     private bool isHovering = false;
     private float hoverTimer = 0f;
+
+    // ==== Tambahan Sensor ====
+    [Header("Sensor Movement Settings")]
+    public float sensorSensitivity = 0.02f;
+    public bool invertPitch = false;
+    public bool invertRoll = false;
 
     void Start()
     {
@@ -53,18 +62,38 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // ==== Input kiri/kanan (X) & maju/mundur (Z) ====
-        float horizontalInput = Input.GetAxisRaw("Horizontal"); // A/D
-        float verticalInput = Input.GetAxisRaw("Vertical");     // W/S
+        // ================================
+        //       INPUT KEYBOARD
+        // ================================
+        float horizontalInput = Input.GetAxisRaw("Horizontal"); // A/D atau ??
+        float verticalInput = Input.GetAxisRaw("Vertical");     // W/S atau ??
 
-        // Update arah facing player kalau ada input
+        // ================================
+        //       INPUT SENSOR MPU6050
+        // ================================
+        float pitch = controller != null ? controller.Pitch : 0f; // anggukan
+        float roll = controller != null ? controller.Roll : 0f; // miring kiri/kanan
+
+        // Pembalikan jika perlu
+        if (invertPitch) pitch *= -1f;
+        if (invertRoll) roll *= -1f;
+
+        // Gabungkan sensor + keyboard
+        horizontalInput += roll * sensorSensitivity;
+        verticalInput += pitch * sensorSensitivity;
+
+        // ================================
+        //       UPDATE FACING PLAYER
+        // ================================
         Vector3 facingDir = new Vector3(horizontalInput, 0, verticalInput);
         if (facingDir.sqrMagnitude > 0.01f)
         {
             transform.forward = facingDir.normalized;
         }
 
-        // ==== Ground Check ====
+        // ================================
+        //          GROUND CHECK
+        // ================================
         isGrounded = false;
         foreach (var groundCheck in groundChecks)
         {
@@ -75,7 +104,9 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // ==== Wall Check ====
+        // ================================
+        //          WALL CHECK
+        // ================================
         bool blocked = false;
         foreach (var wallCheck in wallChecks)
         {
@@ -86,7 +117,9 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // ==== Reset Jump & Hover ====
+        // ================================
+        //     RESET JUMP & HOVER
+        // ================================
         if (isGrounded)
         {
             jumpCount = 0;
@@ -95,7 +128,9 @@ public class PlayerController : MonoBehaviour
             if (velocity.y < 0) velocity.y = 0;
         }
 
-        // ==== Lompat ====
+        // ================================
+        //              LOMPAT
+        // ================================
         if (Input.GetButtonDown("Jump"))
         {
             if (jumpCount < maxJumps)
@@ -109,7 +144,9 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        // ==== Hover ====
+        // ================================
+        //              HOVER
+        // ================================
         if (jumpCount >= maxJumps && !isGrounded && Input.GetButton("Jump") && hoverTimer > 0f)
         {
             isHovering = true;
@@ -122,13 +159,17 @@ public class PlayerController : MonoBehaviour
             velocity.y += gravity * Time.deltaTime;
         }
 
-        // ==== Movement (X/Z) ====
+        // ================================
+        //              GERAK
+        // ================================
         Vector3 move = new Vector3(horizontalInput * runSpeed, 0, verticalInput * runSpeed);
         if (blocked) move = Vector3.zero;
 
         characterController.Move((move + velocity) * Time.deltaTime);
 
-        // ==== Animator Sync ====
+        // ================================
+        //             ANIMATOR
+        // ================================
         if (animator != null)
         {
             animator.SetFloat("speed", new Vector2(horizontalInput, verticalInput).magnitude);
@@ -137,7 +178,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void DieAndRespawn()
+    public void DieAndRespawn()
     {
         Debug.Log("Player jatuh & respawn!");
 
