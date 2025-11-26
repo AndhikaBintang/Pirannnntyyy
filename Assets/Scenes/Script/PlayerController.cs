@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,16 +34,25 @@ public class PlayerController : MonoBehaviour
     private bool isHovering = false;
     private float hoverTimer = 0f;
 
-    // ==== Tambahan Sensor ====
+    // ==== Sensor Movement ====
     [Header("Sensor Movement Settings")]
     public float sensorSensitivity = 0.02f;
     public bool invertPitch = false;
     public bool invertRoll = false;
 
+    // ==== HEALTH SYSTEM ====
+    [Header("Health Settings")]
+    [SerializeField] private int maxHealth = 100;
+    private int currentHealth;
+    public bool isDead = false;
+
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+
+        currentHealth = maxHealth;
 
         if (respawnPoint == null)
         {
@@ -53,9 +62,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
     void Update()
     {
-        // ==== Death Check ====
+        if (isDead) return;   // blok semua gerakan ketika mati
+
+        // ==== Death Check (jatuh ke void) ====
         if (transform.position.y < fallDeathY)
         {
             DieAndRespawn();
@@ -63,27 +75,25 @@ public class PlayerController : MonoBehaviour
         }
 
         // ================================
-        //       INPUT KEYBOARD
+        //     INPUT KEYBOARD
         // ================================
-        float horizontalInput = Input.GetAxisRaw("Horizontal"); // A/D atau ??
-        float verticalInput = Input.GetAxisRaw("Vertical");     // W/S atau ??
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        float verticalInput = Input.GetAxisRaw("Vertical");
 
         // ================================
         //       INPUT SENSOR MPU6050
         // ================================
-        float pitch = controller != null ? controller.Pitch : 0f; // anggukan
-        float roll = controller != null ? controller.Roll : 0f; // miring kiri/kanan
+        float pitch = controller != null ? controller.Pitch : 0f; // up/down
+        float roll = controller != null ? controller.Roll : 0f;   // left/right
 
-        // Pembalikan jika perlu
         if (invertPitch) pitch *= -1f;
         if (invertRoll) roll *= -1f;
 
-        // Gabungkan sensor + keyboard
         horizontalInput += roll * sensorSensitivity;
         verticalInput += pitch * sensorSensitivity;
 
         // ================================
-        //       UPDATE FACING PLAYER
+        //       PLAYER FACING
         // ================================
         Vector3 facingDir = new Vector3(horizontalInput, 0, verticalInput);
         if (facingDir.sqrMagnitude > 0.01f)
@@ -91,13 +101,14 @@ public class PlayerController : MonoBehaviour
             transform.forward = facingDir.normalized;
         }
 
+
         // ================================
         //          GROUND CHECK
         // ================================
         isGrounded = false;
         foreach (var groundCheck in groundChecks)
         {
-            if (Physics.CheckSphere(groundCheck.position, 0.1f, groundLayer, QueryTriggerInteraction.Ignore))
+            if (Physics.CheckSphere(groundCheck.position, 0.1f, groundLayer))
             {
                 isGrounded = true;
                 break;
@@ -110,7 +121,7 @@ public class PlayerController : MonoBehaviour
         bool blocked = false;
         foreach (var wallCheck in wallChecks)
         {
-            if (Physics.CheckSphere(wallCheck.position, 0.1f, groundLayer, QueryTriggerInteraction.Ignore))
+            if (Physics.CheckSphere(wallCheck.position, 0.1f, groundLayer))
             {
                 blocked = true;
                 break;
@@ -118,7 +129,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // ================================
-        //     RESET JUMP & HOVER
+        //     RESET JUMP / HOVER
         // ================================
         if (isGrounded)
         {
@@ -129,7 +140,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // ================================
-        //              LOMPAT
+        //             JUMP
         // ================================
         if (Input.GetButtonDown("Jump"))
         {
@@ -137,17 +148,16 @@ public class PlayerController : MonoBehaviour
             {
                 velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
                 jumpCount++;
+
                 if (jumpCount >= maxJumps)
-                {
                     hoverTimer = hoverDuration;
-                }
             }
         }
 
         // ================================
-        //              HOVER
+        //             HOVER
         // ================================
-        if (jumpCount >= maxJumps && !isGrounded && Input.GetButton("Jump") && hoverTimer > 0f)
+        if (jumpCount >= maxJumps && !isGrounded && Input.GetButton("Jump") && hoverTimer > 0)
         {
             isHovering = true;
             velocity.y = Mathf.Max(velocity.y, hoverGravity * Time.deltaTime);
@@ -160,7 +170,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // ================================
-        //              GERAK
+        //             MOVE
         // ================================
         Vector3 move = new Vector3(horizontalInput * runSpeed, 0, verticalInput * runSpeed);
         if (blocked) move = Vector3.zero;
@@ -170,7 +180,7 @@ public class PlayerController : MonoBehaviour
         // ================================
         //             ANIMATOR
         // ================================
-        if (animator != null)
+        if (animator)
         {
             animator.SetFloat("speed", new Vector2(horizontalInput, verticalInput).magnitude);
             animator.SetBool("isGrounded", isGrounded);
@@ -178,9 +188,42 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+    // ============================================================
+    //                       HEALTH SYSTEM
+    // ============================================================
+    public void TakeDamage(int amount)
+    {
+        if (isDead) return;
+
+        currentHealth -= amount;
+        Debug.Log("Player Damage: " + amount + " | Health Now: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        isDead = true;
+        Debug.Log("PLAYER DEAD");
+
+        velocity = Vector3.zero;
+        characterController.enabled = false;
+
+        // Panggil GameManager (wajib ada)
+        GameManager.Instance.GameOver();
+    }
+
+
+    // ============================================================
+    //                      RESPAWN SYSTEM
+    // ============================================================
     public void DieAndRespawn()
     {
-        Debug.Log("Player jatuh & respawn!");
+        Debug.Log("Player jatuh ke void → Respawn");
 
         velocity = Vector3.zero;
         characterController.enabled = false;
@@ -190,6 +233,9 @@ public class PlayerController : MonoBehaviour
         jumpCount = 0;
         isHovering = false;
         hoverTimer = 0f;
+
+        // Reset HP
+        currentHealth = maxHealth;
     }
 
     public void SetCheckpoint(Vector3 newPosition)

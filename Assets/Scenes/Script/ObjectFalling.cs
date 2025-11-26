@@ -1,21 +1,27 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ObjectFalling : MonoBehaviour
 {
+    public int damageAmount = 10; // damage ke player
+
     private void OnTriggerEnter(Collider other)
     {
-        other.GetComponent<PlayerController>()?.DieAndRespawn();
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        StartCoroutine(Destroy());
+        HealthSystem health = other.GetComponent<HealthSystem>();
+        if (health != null)
+        {
+            health.TakeDamage(damageAmount);   // Kurangi health 10
+        }
     }
 
-    private IEnumerator Destroy()
+    private void OnCollisionEnter(Collision collision)
     {
-        yield return new WaitForSeconds(2);  
+        StartCoroutine(DestroyAfterDelay());
+    }
+
+    private IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
         Destroy(gameObject);
     }
 }

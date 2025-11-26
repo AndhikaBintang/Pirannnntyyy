@@ -8,6 +8,7 @@ public class SpawnerManager : MonoBehaviour
     public List<GameObject> fallingObjects;
     public Transform spawnPoint;
     public float rangeX, rangeY;
+    
 
 
     // Start is called before the first frame update
