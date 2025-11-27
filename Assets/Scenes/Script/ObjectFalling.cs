@@ -4,6 +4,7 @@ using UnityEngine;
 public class ObjectFalling : MonoBehaviour
 {
     public int damageAmount = 10; // damage ke player
+    [HideInInspector] public SpawnerManager spawner;
 
     private void OnTriggerEnter(Collider other)
     {
