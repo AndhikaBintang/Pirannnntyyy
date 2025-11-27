@@ -258,6 +258,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1147575801939972958}
+  - component: {fileID: 2724849724400808906}
   m_Layer: 0
   m_Name: Pillar
   m_TagString: Untagged
@@ -286,6 +287,27 @@ Transform:
   - {fileID: 7091478586369210844}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2724849724400808906
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4941233955380027684}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.1333479, y: 2.948417, z: 1}
+  m_Center: {x: -0.12053654, y: 0.4273184, z: 0}
 --- !u!1 &6237418923308421768
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,7 +485,6 @@ GameObject:
   - component: {fileID: 6060722025016114328}
   - component: {fileID: 301337642164127570}
   - component: {fileID: 1880561284422298401}
-  - component: {fileID: 4565653131547251197}
   m_Layer: 0
   m_Name: Cube.015
   m_TagString: Untagged
@@ -536,24 +557,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &4565653131547251197
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7268496854911895052}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.015060066, y: 0.013373368, z: 0.039660636}
-  m_Center: {x: 0.0059104324, y: -2.1167078e-16, z: 0.009544121}

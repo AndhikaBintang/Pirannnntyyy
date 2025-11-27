@@ -859,7 +859,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 0.4936489, g: 0.5110137, b: 0.7207546, a: 1}
+  m_Color: {r: 0.56194377, g: 0.572634, b: 0.6603774, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -918,13 +918,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.10157533, y: -0.4199556, z: 0.04736535, w: 0.9005978}
+  m_LocalRotation: {x: 0.89841115, y: 0.00007664151, z: 0.43915537, w: -0.00015679095}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 12.87, y: -50, z: 0}
+  m_LocalEulerAnglesHint: {x: 180.02, y: -52.1, z: 0}
 --- !u!114 &410087042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2135,8 +2135,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Terrain
       objectReference: {fileID: 0}
+    - target: {fileID: 8188429565840666967, guid: 034afcf7346c5ba4fadd94bb2553ec1a,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 53.8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 783232109581613638, guid: 034afcf7346c5ba4fadd94bb2553ec1a, type: 3}
+    - {fileID: 527582397035133884, guid: 034afcf7346c5ba4fadd94bb2553ec1a, type: 3}
+    - {fileID: 5230473289183644189, guid: 034afcf7346c5ba4fadd94bb2553ec1a, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 034afcf7346c5ba4fadd94bb2553ec1a, type: 3}

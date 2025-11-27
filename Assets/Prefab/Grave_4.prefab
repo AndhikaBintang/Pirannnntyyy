@@ -94,7 +94,6 @@ GameObject:
   - component: {fileID: 3652611280880584572}
   - component: {fileID: 7152399462132173095}
   - component: {fileID: 5181098660861614447}
-  - component: {fileID: 1055019541449965733}
   m_Layer: 0
   m_Name: Cube.090
   m_TagString: Untagged
@@ -167,27 +166,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1055019541449965733
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1954115357709055193}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.020000022, y: 0.019999996, z: 0.21455255}
-  m_Center: {x: -3.2776436e-17, y: 9.742891e-19, z: -0.09727638}
 --- !u!1 &4941233955380027684
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,6 +175,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1147575801939972958}
+  - component: {fileID: 2822073988474314264}
   m_Layer: 0
   m_Name: Grave_4
   m_TagString: Untagged
@@ -223,6 +202,27 @@ Transform:
   - {fileID: 2474316489660959199}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2822073988474314264
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4941233955380027684}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.9444199, y: 1.9552736, z: 3.9888523}
+  m_Center: {x: -0.016770363, y: 0.7840444, z: 0.0068611144}
 --- !u!1 &8369578622998565982
 GameObject:
   m_ObjectHideFlags: 0
